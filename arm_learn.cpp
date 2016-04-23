@@ -1,17 +1,17 @@
 #include <stdio.h>
 //#include <raspicam/raspicam.h>
 #include <iostream>
+#include <unistd.h>
+#include <ncurses.h>
+
 /*
- * Teach an arm to learn to move to a certain location given an image containing that location
+ *  Teach an arm to learn to move to a certain location given an image containing that location
  *
  *  There is the question of specifying the location of the object in pixels or just giving it an image and hoping it doe 
  *  its thing with a given image.
- *  
  *  I want to use an electronic success signal: when the end-effector reaches the desired location, a circuit is complete
- *  
  *  I like this approach because it is very binary and obvious whether or not the task has been successfully accomplished.
  *  The computer will know on its own whether or not it has been successful.  
- *
  *  Idea is to manually move the end-effector with buttons a few times for a given image - perhaps only one time for each
  *  position, and see how well it does.
  */
@@ -39,13 +39,19 @@ int main ()
             // Begin recording button movements to complete move task
             while (!SUCCESSFUL)
             {
+
+                // init ints that will hold keypress time for each servo button.  These numbers will ultimately fed to TensorFlow
+                int h,i,j,k = 0;
                 // if key pressed is one of our desired servo keys... http://www.asciitable.com/
                 int key = getchar();
-                if (key == 104 || key == 105 || key == 106 || key == 107)
+                while (key && key == 104 || key == 105 || key == 106 || key == 107) // h, i, j, k
                 {
-                    cout << key << endl;
+                    cout << key << " pressed" << endl;
                     // Record buttons for time depressed
+                    // record ms
+                    key = 0;                                              
                 }
+
                 if (1==2/*pin is high*/)
                 {
                     SUCCESSFUL = true;
