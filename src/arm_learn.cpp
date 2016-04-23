@@ -5,7 +5,7 @@
 #include <ncurses.h>
 #include <time.h>
 #include <wiringPi.h>
-
+#include <fstream>
 /*
  *  Teach an arm to learn to move to a certain location given an image containing that location
  *
@@ -19,42 +19,49 @@
  */
 
 using namespace std;
-
 const int TASK_TIME_LIMIT_SECS = 20;
 
 int main ()
 {
     // required by ncurses.h; inits key read
     initscr();
-
     // initiate/instantiate Raspicam
-    //raspicam::RaspiCam Camera;
+    raspicam::RaspiCam Camera;
     
     while (1==1) 
     {
-        bool BEGIN = false; // boolean that waits for user to hit space bar to begin capture image and record sequence
         int key = getch();  // read keyboard input
         cout << key << endl;
         
-       if (key == 32) 
-          BEGIN = true;
+        if (key == ' ' || key == 32) // TODO which one? 
+        {
+            // Capture an image
+            // Save it to a file to be read into TensorFlow later 
 
-       if (BEGIN)
-       {
-        // Capture an image
-        // Save it to a file to be read into TensorFlow later 
+            cout << "Opening Camera..." << endl;
+            if (!Camera.open())
+            {
+                cerr<<"Error opening camera"<<endl;
+                return -1;
+            }
+            cout << "capturing an image" << endl; 
+            Camera.grab();
+    
+            unsigned char *data=new unsigned char[Camera.getImageTypeSize (raspicam::RASPICAM_FORMAT_GRAY )];
+            Camera.retrieve(data,raspicam::RASPICAM_FORMAT_GRAY);  //get the image
+    //save
+            // TODO what to name files?
+            std::ofstream outFile("TODO.ppm",std::ios::binary);
+            outFile<<"P6\n"<<Camera.getWidth() <<" "<<Camera.getHeight() << endl;
+            outFile.write(( char* ) data, Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY));
+            
+            cout<<"Image saved at raspicam_image.ppm"<<endl;
+            // delete the image from memory
+            delete data; 
 
-     /*   cout << "Opening Camera..." << endl;
-         if (!Camera.open())
-         {
-             cerr<<"Error opening camera"<<endl;
-             return -1;
-         }
-        cout << "capturing an image" << endl; 
-         Camera.grab();
-    */
-        // wait one second to allow image to be written to file before recording servo inputs
+            // wait one second to allow image to be written to file before recording servo inputs
             sleep(1);
+    
             bool SUCCESSFUL = false; // has arm successfully completed its task?
             
             // Begin recording button movements to complete move task
