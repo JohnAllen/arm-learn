@@ -48,12 +48,12 @@ int main ()
             Camera.grab();
     
             unsigned char *data=new unsigned char[Camera.getImageTypeSize (raspicam::RASPICAM_FORMAT_GRAY )];
-            Camera.retrieve(data,raspicam::RASPICAM_FORMAT_GRAY);  //get the image
+            Camera.retrieve(data);  //get the image
     //save
             // TODO what to name files?
             std::ofstream outFile("TODO.ppm",std::ios::binary);
             outFile<<"P6\n"<<Camera.getWidth() <<" "<<Camera.getHeight() << endl;
-            outFile.write(( char* ) data, Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY));
+            outFile.write((char*) data, Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY));
             
             cout<<"Image saved at raspicam_image.ppm"<<endl;
             // delete the image from memory
