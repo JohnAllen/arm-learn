@@ -3,6 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <ncurses.h>
+#include <time.h>
 
 /*
  *  Teach an arm to learn to move to a certain location given an image containing that location
@@ -18,48 +19,101 @@
 
 using namespace std;
 
+const int TASK_TIME_LIMIT_SECS= 20;
 int main ()
 {
+    // required by ncurses.h; inits key read
+    initscr();
+
+    // initiate/instantiate Raspicam
     //raspicam::RaspiCam Camera;
+    
     while (1==1) 
     {
+        bool BEGIN = false; // boolean that waits for user to hit space bar to begin capture image and record sequence
+        int key = getch();  // read keyboard input
+        cout << key << endl;
+        
+       if (key == 32) 
+          BEGIN = true;
+
+       if (BEGIN)
+       {
+        // Capture an image
+        // Save it to a file to be read into TensorFlow later 
+
      /*   cout << "Opening Camera..." << endl;
          if (!Camera.open())
          {
              cerr<<"Error opening camera"<<endl;
              return -1;
          }
+        cout << "capturing an image" << endl; 
          Camera.grab();
     */
-        // Capture an image
-        // Save it to a file to be read into a TF Python interface later 
-        if (getchar() == 32)
-        {
-            bool SUCCESSFUL = false;
+        // wait one second to allow image to be written to file before recording servo inputs
+            sleep(1);
+            bool SUCCESSFUL = false; // has arm successfully completed its task?
+            
             // Begin recording button movements to complete move task
-            while (!SUCCESSFUL)
+            // time to complete task counter; 
+            //  if time greater than some max amount, don't even include it in our dataset - start over.  
+            //  This could go on for ours if exploring to much or something else goes wrong.
+            int TASK_ATTEMPT_DURATION_SECS = 0;
+            time_t begin = time(NULL); 
+            while (!SUCCESSFUL && TASK_ATTEMPT_DURATION_SECS < TASK_TIME_LIMIT_SECS)
             {
-
+                cout << "Beginning attempt of robotic task.  I have " << TASK_TIME_LIMIT_SECS << " seconds to complete it" << endl;
                 // init ints that will hold keypress time for each servo button.  These numbers will ultimately fed to TensorFlow
                 int h,i,j,k = 0;
                 // if key pressed is one of our desired servo keys... http://www.asciitable.com/
-                int key = getchar();
-                while (key && key == 104 || key == 105 || key == 106 || key == 107) // h, i, j, k
+                nodelay(stdscr, TRUE);  // make the screen input non-blocking
+                while (key && key <= 107 && key >= 104) 
                 {
                     cout << key << " pressed" << endl;
                     // Record buttons for time depressed
                     // record ms
-                    key = 0;                                              
+                    switch (key)
+                    {
+                        case 104:
+                        {
+                            h++;
+                            cout << " h pressed" << endl;
+                        }
+                        case 105:
+                        {
+                            i++;
+                            cout << " i pressed" << endl;
+                        }
+                        case 106:
+                        {
+                            j++;
+                            cout << " j pressed" << endl;
+                        }
+                        case 107:
+                        {
+                            k++;
+                            cout << " k pressed" << endl;
+                        }
+                    }                    
                 }
 
+                // If electronic circuit has completed
                 if (1==2/*pin is high*/)
                 {
-                    SUCCESSFUL = true;
+                    SUCCESSFUL = true; // exit loop that will store servo times 
                 }
+                
+                time_t now = time(NULL);
+                TASK_ATTEMPT_DURATION_SECS = difftime(now, begin); 
+                cout << "SECONDS PASSED: " << TASK_ATTEMPT_DURATION_SECS << endl;
+                cout << "I have " << TASK_TIME_LIMIT_SECS - TASK_ATTEMPT_DURATION_SECS << " seconds left to complete the task"<< endl;
+                sleep(1);
             }
+            // write individual servo times somewhere once task was successful
             // reset servo to initial state and wait for another 32/space bar
-            // ...      
         }
+    sleep(.5);
    } 
                 return 0;   
 }
