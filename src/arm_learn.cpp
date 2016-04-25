@@ -26,28 +26,28 @@ int main ()
     // required by ncurses.h; inits key read
     initscr();
     // initiate/instantiate Raspicam
-    raspicam::RaspiCam Camera;
+    int TASK_ATTEMPT_DURATION_SECS = 0;
     
     while (1==1) 
     {
         int key = getch();  // read keyboard input
         cout << key << endl;
         
-        if (key == ' ' || key == 32) // TODO which one? 
+        if (key == ' ' || key == 32 || TASK_ATTEMPT_DURATION_SECS >= TASK_TIME_LIMIT_SECS) // TODO which one? 
         {
             // Capture an image
             // Save it to a file to be read into TensorFlow later 
-
+            raspicam::RaspiCam Camera;
             cout << "Opening Camera..." << endl;
             if (!Camera.open())
             {
-                cerr<<"Error opening camera"<<endl;
+                cerr<<"Error opening camera"<< endl;
                 return -1;
             }
             cout << "capturing an image" << endl; 
             Camera.grab();
     
-            unsigned char *data=new unsigned char[Camera.getImageTypeSize (raspicam::RASPICAM_FORMAT_GRAY )];
+            unsigned char *data = new unsigned char[Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY )];
             Camera.retrieve(data);  //get the image
     //save
             // TODO what to name files?
@@ -68,11 +68,11 @@ int main ()
             // time to complete task counter; 
             //  if time greater than some max amount, don't even include it in our dataset - start over.  
             //  This could go on for ours if exploring to much or something else goes wrong.
-            int TASK_ATTEMPT_DURATION_SECS = 0;
             time_t begin = time(NULL); 
+            cout << "Beginning attempt of robotic task.  I have " << TASK_TIME_LIMIT_SECS << " seconds to complete it" << endl;
+            
             while (!SUCCESSFUL && TASK_ATTEMPT_DURATION_SECS < TASK_TIME_LIMIT_SECS)
             {
-                cout << "Beginning attempt of robotic task.  I have " << TASK_TIME_LIMIT_SECS << " seconds to complete it" << endl;
                 // init ints that will hold keypress time for each servo button.  These numbers will ultimately fed to TensorFlow
                 int h,i,j,k = 0;
                 // if key pressed is one of our desired servo keys... http://www.asciitable.com/
