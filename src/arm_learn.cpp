@@ -6,10 +6,11 @@
 #include <time.h>
 #include <wiringPi.h>
 #include <fstream>
+
 /*
  *  Teach an arm to learn to move to a certain location given an image containing that location
  *
- *  There is the question of specifying the location of the object in pixels or just giving it an image and hoping it doe 
+ *  There is the question of specifying the location of the object in pixels or just giving it an image and hoping it do 
  *  its thing with a given image.
  *  I want to use an electronic success signal: when the end-effector reaches the desired location, a circuit is complete
  *  I like this approach because it is very binary and obvious whether or not the task has been successfully accomplished.
@@ -25,7 +26,6 @@ int main ()
 {
     // required by ncurses.h; inits key read
     initscr();
-    // initiate/instantiate Raspicam
     int TASK_ATTEMPT_DURATION_SECS = 0;
     
     while (1==1) 
@@ -37,6 +37,7 @@ int main ()
         {
             // Capture an image
             // Save it to a file to be read into TensorFlow later 
+            // initiate/instantiate Raspicam
             raspicam::RaspiCam Camera;
             cout << "Opening Camera..." << endl;
             if (!Camera.open())
