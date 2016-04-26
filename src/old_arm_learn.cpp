@@ -11,44 +11,6 @@
 #include <string>
 #include <chrono>
 
-#define PIN_BASE 300
-#define MAX_PWM 4096
-#define HERTZ 50
-
-#define SERVO_0 300
-#define SERVO_1 301
-#define SERVO_2 302
-#define SERVO_3 303 
-
-#define MIN_0 0.9
-#define MAX_0 2.1
-#define MIN_1 0.9
-#define MAX_1 2.1
-
-/**
- *  *  * Calculate the number of ticks the signal should be high for the required amount of time
- *   *   */
-int calcTicks(float impulseMs, int hertz)
-{
-        float cycleMs = 1000.0f / hertz;
-            return (int)(MAX_PWM * impulseMs / cycleMs + 0.5f);
-}
-
-float map(float input, float min, float max)
-{
-        return (input * max) + (1 - input) * min;
-}
-
-float range_increment(float min, float max, float millis)
-{
-        return (max - min) / millis;
-}
-
-int angleMicroSec(int tick)
-{
-        return tick;
-}
-
 /*
  *  Teach an arm to learn to move to a certain location given an image containing that location
  *
@@ -75,25 +37,28 @@ int main ()
         cout << "wiring pi not setup " << endl;
         exit(0);
     }
+    cout << "wiring pi setup" << endl;
+    cout << "setting PWM pins to out..." << endl;
+    pinMode(1, PWM_OUTPUT);
+    pinMode(23, PWM_OUTPUT);
+        
+ //   sleep(2);
+    cout << "setting PWM mode to 0" << endl;    
+    pwmSetMode(0); 
+    pwmSetClock(400); //clock at 50kHz (20us tick)
+    pwmSetRange(1000); //range at 1000 ticks (20ms)
+
+    // set both servos to starting position
+    cout << "setting pins to 70" << endl;
     
-    int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
-    
-    if (fd < 0) {
-        printf("Error in setup\n");
-        return fd;
-    }
-    
-    pca9685PWMReset(fd);
-    
+   // sleep(2);
+    pwmWrite(1, 55); // center pan, #1 servo 
+    pwmWrite(23, 55); //
+    sleep(2);
+    pwmWrite(1, 65); // center pan, #1 servo 
+    pwmWrite(2, 65); //
+    sleep(3);
     initscr();
-    
-    int tick, i, j = 0;
-
-    float increment = range_increment(MIN_0, MAX_0, SCAN_TIME);
-    tick = calcTicks(MIN_0, HERTZ);
-    pwmWrite(SERVO_0, tick);  // set servo to minimum
-
-    
     while (1==1) 
     {
         int key = getch();  // read keyboard input
