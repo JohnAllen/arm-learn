@@ -1,5 +1,8 @@
 #include "servo_commands.h"
 #include <iostream>
+#include <wiringPi.h>
+#include <pca9685.h>
+
 /**
  *  *  *  * Calculate the number of ticks the signal should be high for the required amount of time
  *   *   *   */
@@ -35,5 +38,14 @@ int resetServos()
     for (i = 0; i < sizeof(PIN_NUMS); i++)
     {
         cout << "turning off servo with pin: " << PIN_NUMS[i] << endl;
+        setServoMin(PIN_NUMS[i]);
     }
 }
+
+int setServoMin(int num)
+{
+    int tick = calcTicks(.6, HERTZ);
+    pwmWrite(num, tick);
+    return 0;
+}
+

@@ -30,9 +30,6 @@ int main ()
     pca9685PWMReset(fd);
     int tick, i, j = 0;
 
-    int SCAN_TIME = 5000; 
-    float increment = range_increment(MIN_0, MAX_0, SCAN_TIME);
-    tick = calcTicks(MIN_0, HERTZ);
 
     resetServos();
 
@@ -67,29 +64,14 @@ int main ()
                 return -1;
             }
 
-            cout<<"saving picture.jpg"<<endl;
+            cout << "saving picture.jpg" << endl;
             ofstream file ( "picture.jpg",ios::binary );
             file.write(( char*)data, length);
 
-/*
-            unsigned char *data = new unsigned char[Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB )];
-            //sleep(3); 
-            Camera.retrieve(data);  //get the image
-    //save
-  */       
-            /*std::ofstream outFile(file_name,std::ios::binary);
-            outFile<<"P6\n"<<Camera.getWidth() <<" "<<Camera.getHeight() << endl;
-            outFile.write((char*) data, Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
-            cout<< "Image saved at " << file_name << endl;
-           */ // delete the image from memory
             delete data; 
 
-            // wait one second to allow image to be written to file before recording servo inputs
-            sleep(1);
-    
             bool SUCCESSFUL = false; // has arm successfully completed its task?
             
-            // Begin recording button movements to complete move task
             // time to complete task counter; 
             //  if time greater than some max amount, don't even include it in our dataset - start over.  
             //  This could go on for ours if exploring to much or something else goes wrong.
@@ -137,6 +119,7 @@ int main ()
               if (1==2/*pin is high*/)
                 {
                     SUCCESSFUL = true; // exit loop that will store servo times 
+                    resetServos();
                 }
                 
                 time_t now = time(NULL);

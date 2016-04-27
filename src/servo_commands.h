@@ -6,6 +6,7 @@ float map(float input, float min, float max);
 float range_increment(float min, float max, float millis);
 int angleMicroSec(int tick);
 int resetServos();
+int setServoMin(int num);
 
 #define PIN_BASE 300
 #define MAX_PWM 4096
