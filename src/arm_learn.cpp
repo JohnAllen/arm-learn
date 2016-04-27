@@ -30,7 +30,7 @@ int main ()
     pca9685PWMReset(fd);
     int tick, i, j = 0;
 
-
+    // start servos at some base position every time
     resetServos();
 
     initscr();
@@ -89,25 +89,31 @@ int main ()
                     cout << key << " pressed" << endl;
                     // Record buttons for time depressed
                     // Each loop increments key counter one second - see sleep(1) below 
+                    
+                    // increase position of servo while its key is pressed
                     switch (key)
                     {
                         case 104:
                         {
+                            increaseServo(300);
                             h++;
                             cout << " h pressed" << endl;
                         }
                         case 105:
                         {
+                            increaseServo(301);
                             i++;
                             cout << " i pressed" << endl;
                         }
                         case 106:
                         {
+                            increaseServo(302);
                             j++;
                             cout << " j pressed" << endl;
                         }
                         case 107:
                         {
+                            increaseServo(303);
                             k++;
                             cout << " k pressed" << endl;
                         }
@@ -119,7 +125,8 @@ int main ()
               if (1==2/*pin is high*/)
                 {
                     SUCCESSFUL = true; // exit loop that will store servo times 
-                    resetServos();
+                    pca9685PWMReset(fd); // do we need this?
+                    resetServos(); // reset servo positions to base
                 }
                 
                 time_t now = time(NULL);
