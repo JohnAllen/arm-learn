@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <time.h>
+#include <dirent.h>
 #include <wiringPi.h>
 #include <pca9685.h>
 #include <fstream>
@@ -21,7 +22,6 @@ int main ()
     int TASK_ATTEMPT_DURATION_SECS = 0;
     
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
-    
     if (fd < 0) {
         printf("Error in setup\n");
         return fd;
@@ -32,7 +32,6 @@ int main ()
 
     // start servos at some base position every time
     resetServos();
-
     initscr();
     while (1==1) 
     {
@@ -44,32 +43,35 @@ int main ()
             // Capture an image
             // Save it to a file to be read into TensorFlow later 
             // initiate/instantiate Raspicam
-           raspicam::RaspiCam_Still Camera;
-            cout << "Opening Camera..." << endl;
+            raspicam::RaspiCam_Still Camera;
+            
             sleep(1); 
             cout << "opening camera capturing an image" << endl; 
             Camera.setWidth(1280);
             Camera.setHeight(960);
             Camera.setISO(600);
-            Camera.setBrightness(65);
+            Camera.setBrightness(60);
             Camera.setEncoding(raspicam::RASPICAM_ENCODING_JPEG); 
             Camera.open();
 
             sleep(1);
-            
             unsigned int length = Camera.getImageBufferSize(); // Header + Image Data + Padding
             unsigned char * data = new unsigned char[length];
-            if ( !Camera.grab_retrieve(data, length) ) {
+            if (!Camera.grab_retrieve(data, length)) {
                 cerr<<"Error in grab"<<endl;
                 return -1;
             }
 
-            cout << "saving picture.jpg" << endl;
-            ofstream file ( "picture.jpg",ios::binary );
+            int highest_file_num = getMaxFileNum();
+            std::string file_name = std::to_string(highest_file_num);
+            file_name = file_name + ".jpg";
+            cout << "saving training image with num " << file_name << endl;
+            ofstream file (file_name, ios::binary);
             file.write(( char*)data, length);
 
             delete data; 
 
+            appendImageToFile(file_name);
             bool SUCCESSFUL = false; // has arm successfully completed its task?
             
             // time to complete task counter; 

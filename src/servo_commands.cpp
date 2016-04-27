@@ -49,3 +49,29 @@ int setServoMin(int num)
     return 0;
 }
 
+int getMaxFileNum()
+{
+    int max_int, file_num = 0;
+    BOOST_FOREACH(const std::string& fname, ls( "../images/*.jpg"))
+    {
+        size_t lastindex = fname.find_last_of("."); 
+        string rawname = fname.substr(0, lastindex); 
+        cout << "file_num is " << rawname << endl;
+        file_num = std::stoi(rawname);
+        if (file_num > max_int)
+        {
+            max_int = file_num;
+            cout << "max_int is now " << max_int << endl;
+        }
+        cout << "File number is " << file_num << endl;
+    }
+
+    return max_int;
+}
+
+void appendImageToFile(char file_name[12])
+{
+    ofstream image_num_file;
+    image_num_file.open("../images/training_images.txt", std::ios_base::app);
+    image_num_file << file_name;
+}
