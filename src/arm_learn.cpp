@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include "../../raspicam/src/raspicam_still.h"
 #include <iostream>
 #include <unistd.h>
 #include <ncurses.h>
@@ -10,56 +8,9 @@
 #include <ctime>
 #include <string>
 #include <chrono>
-
-#define PIN_BASE 300
-#define MAX_PWM 4096
-#define HERTZ 50
-
-#define SERVO_0 300
-#define SERVO_1 301
-#define SERVO_2 302
-#define SERVO_3 303 
-
-#define MIN_0 0.9
-#define MAX_0 2.1
-#define MIN_1 0.9
-#define MAX_1 2.1
-
-/**
- *  *  * Calculate the number of ticks the signal should be high for the required amount of time
- *   *   */
-int calcTicks(float impulseMs, int hertz)
-{
-        float cycleMs = 1000.0f / hertz;
-            return (int)(MAX_PWM * impulseMs / cycleMs + 0.5f);
-}
-
-float map(float input, float min, float max)
-{
-        return (input * max) + (1 - input) * min;
-}
-
-float range_increment(float min, float max, float millis)
-{
-        return (max - min) / millis;
-}
-
-int angleMicroSec(int tick)
-{
-        return tick;
-}
-
-/*
- *  Teach an arm to learn to move to a certain location given an image containing that location
- *
- *  There is the question of specifying the location of the object in pixels or just giving it an image and hoping it do 
- *  its thing with a given image.
- *  I want to use an electronic success signal: when the end-effector reaches the desired location, a circuit is complete
- *  I like this approach because it is very binary and obvious whether or not the task has been successfully accomplished.
- *  The computer will know on its own whether or not it has been successful.  
- *  Idea is to manually move the end-effector with buttons a few times for a given image - perhaps only one time for each
- *  position, and see how well it does.
- */
+#include "servo_commands.h"
+#include <stdio.h>
+#include "../../raspicam/src/raspicam_still.h"
 
 using namespace std;
 const int TASK_TIME_LIMIT_SECS = 20;
@@ -69,13 +20,6 @@ int main ()
     // required by ncurses.h; inits key read
     int TASK_ATTEMPT_DURATION_SECS = 0;
     
-    cout << "Beginning" << endl;
-    if (wiringPiSetup () == -1) //using wPi pin numbering
-    {
-        cout << "wiring pi not setup " << endl;
-        exit(0);
-    }
-    
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
     
     if (fd < 0) {
@@ -84,16 +28,15 @@ int main ()
     }
     
     pca9685PWMReset(fd);
-    
-    initscr();
-    
     int tick, i, j = 0;
 
+    int SCAN_TIME = 5000; 
     float increment = range_increment(MIN_0, MAX_0, SCAN_TIME);
     tick = calcTicks(MIN_0, HERTZ);
-    pwmWrite(SERVO_0, tick);  // set servo to minimum
 
-    
+    resetServos();
+
+    initscr();
     while (1==1) 
     {
         int key = getch();  // read keyboard input
@@ -106,26 +49,17 @@ int main ()
             // initiate/instantiate Raspicam
            raspicam::RaspiCam_Still Camera;
             cout << "Opening Camera..." << endl;
-            sleep(2); 
-            pwmWrite(1, 95); 
-            pwmWrite(2, 95);
-            
-/*           if (!Camera.open())
-            {
-                cerr<<"Error opening camera"<< endl;
-                return -1;
-            }*/
+            sleep(1); 
             cout << "opening camera capturing an image" << endl; 
-//          Camera.grab() // not still 
             Camera.setWidth(1280);
             Camera.setHeight(960);
             Camera.setISO(600);
-        //    Camera.setShutterSpeed(100);
             Camera.setBrightness(65);
             Camera.setEncoding(raspicam::RASPICAM_ENCODING_JPEG); 
             Camera.open();
 
-            sleep(2);
+            sleep(1);
+            
             unsigned int length = Camera.getImageBufferSize(); // Header + Image Data + Padding
             unsigned char * data = new unsigned char[length];
             if ( !Camera.grab_retrieve(data, length) ) {
