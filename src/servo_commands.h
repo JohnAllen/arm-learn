@@ -1,12 +1,16 @@
+#include <string>
+#include <fstream>
+
 #ifndef SERVO_COMMANDS_H
 #define SERVO_COMMANDS_H
-
 int calcTicks(float impulseMs, int hertz);
 float map(float input, float min, float max);
 float range_increment(float min, float max, float millis);
 int angleMicroSec(int tick);
 int resetServos();
 int setServoMin(int num);
+int getMaxFileNum();
+int appendImageToFile(std::string file_name);
 
 #define PIN_BASE 300
 #define MAX_PWM 4096

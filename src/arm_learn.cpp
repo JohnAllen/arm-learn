@@ -20,7 +20,8 @@ int main ()
 {
     // required by ncurses.h; inits key read
     int TASK_ATTEMPT_DURATION_SECS = 0;
-    
+
+    cout << "beginning" << endl;    
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
     if (fd < 0) {
         printf("Error in setup\n");
@@ -31,7 +32,11 @@ int main ()
     int tick, i, j = 0;
 
     // start servos at some base position every time
-    resetServos();
+
+    tick = calcTicks(i, HERTZ);
+    pwmWrite(SERVO_0, tick);
+    
+//    resetServos();
     initscr();
     while (1==1) 
     {
@@ -97,25 +102,25 @@ int main ()
                     {
                         case 104:
                         {
-                            increaseServo(300);
+                    //        increaseServo(300);
                             h++;
                             cout << " h pressed" << endl;
                         }
                         case 105:
                         {
-                            increaseServo(301);
+                      //      increaseServo(301);
                             i++;
                             cout << " i pressed" << endl;
                         }
                         case 106:
                         {
-                            increaseServo(302);
+                        //    increaseServo(302);
                             j++;
                             cout << " j pressed" << endl;
                         }
                         case 107:
                         {
-                            increaseServo(303);
+                         //   increaseServo(303);
                             k++;
                             cout << " k pressed" << endl;
                         }
