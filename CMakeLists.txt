@@ -13,6 +13,18 @@ target_link_libraries (command_arm wiringPi wiringPiDev pthread /usr/local/lib/l
     ncurses
     ${Boost_LIBRARIES}
 )
-add_executable(train_arm src/learn.cpp src/train_arm.cpp src/servo.cpp src/utils.cpp)
-target_link_libraries (train_arm wiringPi wiringPiDev pthread /usr/local/lib/libraspicam.so 
-    )
+add_executable(train_arm src/learn.cpp src/command_arm.cpp src/servo.cpp src/utils.cpp)
+target_link_libraries (train_arm wiringPi wiringPiDev pthread /usr/local/lib/libraspicam.so
+    /usr/local/lib/libwiringPi.so
+    /usr/local/lib/libwiringPiPca9685.so
+    ncurses
+    ${Boost_LIBRARIES}
+)
+add_executable(test src/test.cpp src/servo.cpp src/utils.cpp)
+target_link_libraries (test wiringPi wiringPiDev pthread /usr/local/lib/libraspicam.so
+    /usr/local/lib/libwiringPi.so
+    /usr/local/lib/libwiringPiPca9685.so
+    ncurses
+    ${Boost_LIBRARIES}
+)
+

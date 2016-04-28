@@ -9,11 +9,11 @@
 #include <ctime>
 #include <string>
 #include <chrono>
+#include <stdio.h>
+#include "../../raspicam/src/raspicam_still.h"
 #include "servo.h"
 #include "utils.h"
 #include "learn.h"
-#include <stdio.h>
-#include "../../raspicam/src/raspicam_still.h"
 
 using namespace std;
 const int TASK_TIME_LIMIT_SECS = 20;
@@ -36,7 +36,9 @@ int main ()
 
     tick = calcTicks(i, HERTZ);
     resetServos();
-    
+  
+    int TASK_ATTEMPT_DURATION_SECS; 
+    bool SUCCESSFUL = false; 
     while (1==1) 
     {
 
@@ -49,6 +51,7 @@ int main ()
         }
 
         time_t now = time(NULL);
+        time_t begin = time(NULL);
         TASK_ATTEMPT_DURATION_SECS = difftime(now, begin);
         cout << "SECONDS PASSED: " << TASK_ATTEMPT_DURATION_SECS << endl;
         cout << "I have " << TASK_TIME_LIMIT_SECS - TASK_ATTEMPT_DURATION_SECS << " seconds left to complete the task"<< endl;

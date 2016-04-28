@@ -21,10 +21,14 @@ int setServoMin(int num);
 #define SERVO_2 302
 #define SERVO_3 303 
 
-#define MIN_0 0.9
-#define MAX_0 2.1
-#define MIN_1 0.9
-#define MAX_1 2.1
+#define MIN_0 0.6
+#define MAX_0 2.4
+#define MIN_1 0.6
+#define MAX_1 2.4
+#define MIN_0 0.6
+#define MAX_0 2.4
+#define MIN_1 0.6
+#define MAX_1 2.4
 
 #endif
 

@@ -15,6 +15,7 @@ int PIN_NUMS[4] = {SERVO_0, SERVO_1, SERVO_2, SERVO_3};
 
 using namespace std;
 using namespace boost::filesystem;
+using namespace boost::system;
 
 
 int calcTicks(float impulseMs, int hertz)
