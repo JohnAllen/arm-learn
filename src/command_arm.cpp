@@ -22,7 +22,6 @@ int main ()
 {
 
     cout << "INITIATING SETUP" << endl;
-
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
     if (fd < 0) {
         printf("Error in setup\n");
@@ -30,28 +29,18 @@ int main ()
     }
     
     pca9685PWMReset(fd);
-    int tick, i, j = 0;
 
     // start servos at some base position every time
 
-    tick = calcTicks(i, HERTZ);
-    pwmWrite(SERVO_0, tick);
+    resetServos();
     
-//    resetServos();
-
-    initscr();
-    while (1==1) 
+    bool SUCCESSFUL = false;
+    while (SUCCESSFUL != true)
     {
-        int key = getch();  // read keyboard input
-        cout << "key" << key << "pressed" << endl;
-        
-        if (key == ' ' || key == 32) 
-        {
-            time_t begin = time(NULL);
-            recordTaskCommands(begin, fd);
-
+        key = getch();
+        if (key)
+            recordKeyPress();
         }
-    sleep(.5);
-   } 
-                return 0;   
+    }   
+    return 0;   
 }

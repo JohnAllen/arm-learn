@@ -66,3 +66,8 @@ int setServoMin(int num)
     return 0;
 }
 
+int incServo(int servo_num)
+{
+    
+}
+

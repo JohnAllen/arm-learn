@@ -15,11 +15,10 @@ int TASK_ATTEMPT_DURATION_SECS = 0;
 int recordTaskCommands(time_t begin, int fd)  
 {
     
- 
     bool SUCCESSFUL = false; // has arm successfully completed its task?  
     cout << "Beginning attempt of robotic task.  I have " << TASK_TIME_LIMIT_SECS << " seconds to complete it" << endl;
-            
-    int key = getch();
+    
+    cout << "key is " << key << endl;       
     while (!SUCCESSFUL && TASK_ATTEMPT_DURATION_SECS < TASK_TIME_LIMIT_SECS)
     {
 

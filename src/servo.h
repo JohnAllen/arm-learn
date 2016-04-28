@@ -12,6 +12,8 @@ int angleMicroSec(int tick);
 int resetServos();
 int setServoMin(int num);
 int servoAngle(int servo_num, int angle);
+int incServo(int servo_num); 
+
 
 #define PIN_BASE 300
 #define MAX_PWM 4096
