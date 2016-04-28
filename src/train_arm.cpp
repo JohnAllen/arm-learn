@@ -35,18 +35,17 @@ int main ()
     // start servos at some base position every time
 
     tick = calcTicks(i, HERTZ);
-    pwmWrite(SERVO_0, tick);
-    
     resetServos();
-
-    initscr();
+    
     while (1==1) 
     {
+
         int CIRCUIT_CONNECTED = digitalRead(4);
-        if (1==2/*pin is high*/)
+        if (CIRCUIT_CONNECTED > 0/*pin is high*/)
         {
             SUCCESSFUL = true; // exit loop that will store servo times 
             resetServos(); // reset servo positions to base
+            // write results to file
         }
 
         time_t now = time(NULL);
@@ -55,5 +54,5 @@ int main ()
         cout << "I have " << TASK_TIME_LIMIT_SECS - TASK_ATTEMPT_DURATION_SECS << " seconds left to complete the task"<< endl;
         sleep(1);
    } 
-                return 0;   
+   return 0;   
 }

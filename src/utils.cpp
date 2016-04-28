@@ -4,6 +4,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include "../../raspicam/src/raspicam_still.h"
+#include "utils.h"
 
 using namespace boost::filesystem;
 using namespace std;
@@ -34,8 +35,8 @@ int captureImage(std::string file_name)
 
     sleep(1);
     cout << "opening camera capturing an image" << endl;
-    Camera.setWidth(1280);
-    Camera.setHeight(960);
+    Camera.setWidth(IMG_WIDTH);
+    Camera.setHeight(IMG_HEIGHT);
     Camera.setISO(550);
     Camera.setBrightness(55);
     Camera.setEncoding(raspicam::RASPICAM_ENCODING_JPEG);

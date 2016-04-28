@@ -80,3 +80,7 @@ int recordTaskCommands(time_t begin, int fd)
                }   
 }
 
+int writeResults()
+{
+
+}

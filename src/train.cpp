@@ -22,7 +22,7 @@ int main ()
     // required by ncurses.h; inits key read
     int TASK_ATTEMPT_DURATION_SECS = 0;
 
-    cout << "beginning" << endl;    
+    cout << "SETTING UP" << endl;    
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
     if (fd < 0) {
         printf("Error in setup\n");
@@ -56,11 +56,10 @@ int main ()
             delete data; 
 
             appendImageToFile(file_name);
-           
             time_t begin = time(NULL); 
             recordTaskCommands();
         }
-    sleep(.5);
+    sleep(.25);
    } 
                 return 0;   
 }
