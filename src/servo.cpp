@@ -1,10 +1,11 @@
-#include "servo_commands.h"
+#include "servo.h"
 #include <fstream>
 #include <iostream>
 #include <wiringPi.h>
 #include <pca9685.h>
 #include <string>
 #include <boost/filesystem.hpp>
+#include "../../raspicam/src/raspicam_still.h"
 
 /**
  *  *  *  * Calculate the number of ticks the signal should be high for the required amount of time
@@ -54,22 +55,3 @@ int setServoMin(int num)
     return 0;
 }
 
-int getMaxFileNum()
-{
-    int max_int, file_num = 0;
-    path p = "../images/*.jpg"; 
-    directory_iterator it{p};
-    while (it != directory_iterator{})
-    {
-        cout << *it++ << '\n';
-    } 
-    return max_int;
-}
-
-int appendImageToFile(std::string file_name)
-{
-    ofstream image_num_file;
-    image_num_file.open("../images/training_images.txt", std::ios_base::app);
-    image_num_file << file_name;
-    return 0;
-}
