@@ -11,6 +11,7 @@ float range_increment(float min, float max, float millis);
 int angleMicroSec(int tick);
 int resetServos();
 int setServoMin(int num);
+int servoAngle(int servo_num, int angle);
 
 #define PIN_BASE 300
 #define MAX_PWM 4096
@@ -20,6 +21,10 @@ int setServoMin(int num);
 #define SERVO_1 301
 #define SERVO_2 302
 #define SERVO_3 303 
+
+const float MIN  = 0.6;
+const float MAX = 2.4;
+
 
 #define MIN_0 0.6
 #define MAX_0 2.4

@@ -19,7 +19,7 @@ int main ()
 {
     // required by ncurses.h; inits key read
 
-    cout << "beginning" << endl;    
+    cout << "BEGINNING TEST" << endl;    
     int fd = pca9685Setup(PIN_BASE, 0x40, HERTZ);
     if (fd < 0) {
         printf("Error in setup\n");
@@ -29,18 +29,17 @@ int main ()
     pca9685PWMReset(fd);
     int tick, i, j = 0;
 
-    resetServos();
+/*    servoAngle(SERVO_0, 20);
+    sleep(1);
+    servoAngle(SERVO_0, 70);
+    sleep(1);
+    servoAngle(SERVO_0, 110);
+*/
+        /*resetServos();
     // start servos at some base position every time
     tick = calcTicks(.6, HERTZ);
     pwmWrite(SERVO_0, tick);
     sleep(1);
-    tick = calcTicks(2.4, HERTZ);
-    pwmWrite(SERVO_0, tick);
-    tick = calcTicks(.6, HERTZ);
-    pwmWrite(SERVO_1, tick);
-    tick = calcTicks(.6, HERTZ);
-    pwmWrite(SERVO_1, tick);
-    tick = calcTicks(.6, HERTZ);
-    pwmWrite(SERVO_2, tick);
-   }
+   */
+}
  

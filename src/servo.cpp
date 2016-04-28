@@ -39,6 +39,16 @@ int angleMicroSec(int tick)
     return tick;
 }
 
+int servoAngle(int servo_num, int angle)
+{
+    float angleRange = 180;
+    float servoRange = MAX - MIN;
+    float anglePercent = angle / angleRange;
+    float servoAngle = MIN + (anglePercent * servoRange);
+    int tick = calcTicks(servoAngle, HERTZ);
+    pwmWrite(servo_num, tick);
+}
+
 int resetServos()
 {
     int i;
