@@ -18,6 +18,7 @@ int recordTaskCommands(time_t begin, int fd)
     bool SUCCESSFUL = false; // has arm successfully completed its task?  
     cout << "Beginning attempt of robotic task.  I have " << TASK_TIME_LIMIT_SECS << " seconds to complete it" << endl;
     
+    int key = getch();    
     cout << "key is " << key << endl;       
     while (!SUCCESSFUL && TASK_ATTEMPT_DURATION_SECS < TASK_TIME_LIMIT_SECS)
     {
@@ -26,6 +27,7 @@ int recordTaskCommands(time_t begin, int fd)
         int h,i,j,k = 0;
         // if key pressed is one of our desired servo keys... http://www.asciitable.com/
         nodelay(stdscr, TRUE);  // make the screen input non-blocking
+        
         while (key && key <= 107 && key >= 104)
         {
             cout << key << " pressed" << endl;

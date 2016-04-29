@@ -17,8 +17,8 @@ def read_my_file_format(filename_and_label_tensor):
   """
   
   record_defaults = [tf.constant([], dtype=tf.string), 
-                   tf.constant([], dtype=tf.int32),   
-                   tf.constant([], dtype=tf.int32)]  
+                   tf.constant([], dtype=tf.float32),   
+                   tf.constant([], dtype=tf.float32)]  
  
   filename, servo_0, servo_1 = tf.decode_csv(filename_and_label_tensor, record_defaults, " ")
   file_contents = tf.read_file(filename)
@@ -34,12 +34,13 @@ batch_size = 1
 
 f = open("paths_labels.txt")
 file_lines = f.readlines()
-
 file_queue = tf.train.string_input_producer(file_lines) 
 image, servo_0, servo_1 = read_my_file_format(file_queue.dequeue())
 
 x = tf.placeholder(tf.float32, shape=(batch_size, IMAGE_SIZE))
-y = tf.placeholder(tf.int32, shape=(batch_size))
+y = tf.placeholder(tf.float32, shape=(batch_size))
+
+#After creating placeholders for the data, the graph is built from the mnist.py file according to a 3-stage pattern: inference(), loss(), and training().
 
 #sess = tf.Session()
 
