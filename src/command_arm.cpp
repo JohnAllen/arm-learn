@@ -37,10 +37,9 @@ int main ()
     bool SUCCESSFUL = false;
     while (SUCCESSFUL != true)
     {
-        key = getch();
-        if (key)
-            recordKeyPress();
-        }
+        int key = getch();
+    //    if (key)
+            //recordKeyPress();
     }   
     return 0;   
 }

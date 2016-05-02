@@ -29,9 +29,21 @@ int main ()
     pca9685PWMReset(fd);
     int tick, i, j = 0;
 
-/*    servoAngle(SERVO_0, 20);
+//    resetServos();
+    cout << "sleeping for a second then setting " << SERVO_0 << " angle to 90" << endl;
+    sleep(.5);
+    servoAngle(SERVO_0, 0);
     sleep(1);
-    servoAngle(SERVO_0, 70);
+//    servoAngle(SERVO_0, 20);
+ //   sleep(1);
+    servoAngle(SERVO_1, 0);
+    sleep(1);
+    servoAngle(SERVO_2, 60);
+    sleep(1);
+//    servoAngle(SERVO_1, 80);
+  //  sleep(1);
+
+/*    servoAngle(SERVO_0, 70);
     sleep(1);
     servoAngle(SERVO_0, 110);
 */
