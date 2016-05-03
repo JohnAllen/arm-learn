@@ -42,6 +42,6 @@ y = tf.placeholder(tf.float32, shape=(batch_size))
 
 #After creating placeholders for the data, the graph is built from the mnist.py file according to a 3-stage pattern: inference(), loss(), and training().
 
-#sess = tf.Session()
+sess = tf.Session()
 
 

@@ -7,6 +7,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include "../../raspicam/src/raspicam_still.h"
+#include <unistd.h>
 
 /**
  *  *  *  * Calculate the number of ticks the signal should be high for the required amount of time
@@ -56,20 +57,42 @@ int servoAngle(int servo_num, int angle)
 
 int resetServos()
 {
-    int i;
-    std::array<int,4> servos = {SERVO_0, SERVO_1, SERVO_2, SERVO_3};
 
-    for (auto& servo : servos) {
-        setServoMin(servo);
-        std::cout << "turning off servo with pin " << servo << '\n';
-    }
+    sleep(1);    
+    servoAngle(SERVO_0, MIN_0);
+    sleep(.5);    
+    servoAngle(SERVO_1, MIN_1);
+    sleep(.5);
+    servoAngle(SERVO_2, MIN_2);
+    sleep(.5);
 }
 
+int posArm(int angle)
+{
+   sleep(1.5);
+
+    //raise 2
+    int tick = calcTicks(2.4, HERTZ);
+    pwmWrite(SERVO_2, tick);
+    sleep(1.5);
+    servoAngle(SERVO_1, TGT_1);
+    sleep(1.5);
+    servoAngle(SERVO_0, angle);
+    sleep(1.5);
+    servoAngle(SERVO_2, TGT_2);
+    return 0;
+}
+int setServoMax(int num)
+{
+    int tick = calcTicks(MAX, HERTZ);
+    pwmWrite(num, tick);
+    return 0;
+}
 int setServoMin(int num)
 {
     int tick = calcTicks(MIN, HERTZ);
     pwmWrite(num, tick);
-//    return 0;
+    return 0;
 }
 
 int incServo(int servo_num)
