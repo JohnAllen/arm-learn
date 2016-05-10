@@ -1,140 +1,79 @@
-from __future__ import absolute_import
-from __future__ import division
 from __future__ import print_function
-
-import os
-import numpy
+import numpy as np
 import tensorflow as tf
+import math as math
+from PIL import Image
+
+def read_from_csv(filename_queue):
+    reader = tf.TextLineReader()
+    _, csv_row = reader.read(filename_queue)
+    record_defaults = [[""],[0]]
+    image_path, label  = tf.decode_csv(csv_row, field_delim=" ", record_defaults=record_defaults)
+    image = tf.image.decode_jpeg(image_path, channels=3)
+    return image, label 
+
+def input_pipeline(batch_size, num_epochs=None):
+    filename_queue = tf.train.string_input_producer(["./28_dense_labels.txt"], num_epochs=num_epochs, shuffle=True)  
+    image, label = read_from_csv(filename_queue)
+    print("image: ", image)  
+    image = tf.reshape(image, [28,28,3])
+    print("image: ", image)  
+    min_after_dequeue = 5
+    capacity = min_after_dequeue + 3 * batch_size
+    image_batch, label_batch = tf.train.batch( [image, label], batch_size=batch_size, capacity=capacity)
+    return image_batch, label_batch
+
+file_length = 7 
+examples, labels = input_pipeline(file_length, 1)
 
 # Parameters
 learning_rate = 0.001
-training_iters = 1000
-batch_size = 1 
+training_epochs = 5
+batch_size = 1
 display_step = 1
 
-n_input = 784
-n_classes = 8 
-dropout = 0.8 # Dropout, probability to keep units
-keep_prob = tf.placeholder(tf.float32) # dropout (keep probability)
+# tf Graph Input
+x = tf.placeholder("float", [None, 784]) # mnist data image of shape 28*28=784
+y = tf.placeholder("float", [None, 10]) # 0-9 digits recognition => 10 classes
 
-
-def read_my_file_format(filename_and_label_tensor):
-  """Consumes a single filename and label as a ' '-delimited string.
-  Args:
-    filename_and_label_tensor: A scalar string tensor.
-
-  Returns:
-Two tensors: the decoded image, and the string label.
-  """
-  
-  record_defaults = [tf.constant([], dtype=tf.string), 
-                   tf.constant([], dtype=tf.float32)]  
- 
-  filename, label = tf.decode_csv(filename_and_label_tensor, record_defaults, " ")
-  file_contents = tf.read_file(filename)
-  example = tf.image.decode_jpeg(file_contents, 1)
-  return example, label
-
-def conv2d(name, l_input, w, b):
-    return tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(l_input, w, strides=[1, 1, 1, 1], padding='SAME'),b), name=name)
-
-def max_pool(name, l_input, k):
-    return tf.nn.max_pool(l_input, ksize=[1, k, k, 1], strides=[1, k, k, 1], padding='SAME', name=name)
-
-def norm(name, l_input, lsize=4):
-    return tf.nn.lrn(l_input, lsize, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name=name)
-
-def alex_net(_X, _weights, _biases, _dropout):
-    # Reshape input picture
-    _X = tf.reshape(_X, shape=[-1, 28, 28, 1])
-
-    # Convolution Layer
-    conv1 = conv2d('conv1', _X, _weights['wc1'], _biases['bc1'])
-    # Max Pooling (down-sampling)
-    pool1 = max_pool('pool1', conv1, k=2)
-    # Apply Normalization
-    norm1 = norm('norm1', pool1, lsize=4)
-    # Apply Dropout
-    norm1 = tf.nn.dropout(norm1, _dropout)
-
-    # Convolution Layer
-    conv2 = conv2d('conv2', norm1, _weights['wc2'], _biases['bc2'])
-    # Max Pooling (down-sampling)
-    pool2 = max_pool('pool2', conv2, k=2)
-    # Apply Normalization
-    norm2 = norm('norm2', pool2, lsize=4)
-    # Apply Dropout
-    norm2 = tf.nn.dropout(norm2, _dropout)
-
-        # Fully connected layer
-    dense1 = tf.reshape(norm2, [-1, _weights['wd1'].get_shape().as_list()[0]]) # Reshape conv3 output to fit dense layer input
-    dense1 = tf.nn.relu(tf.matmul(dense1, _weights['wd1']) + _biases['bd1'], name='fc1') # Relu activation
-
-    dense2 = tf.nn.relu(tf.matmul(dense1, _weights['wd2']) + _biases['bd2'], name='fc2') # Relu activation
-
-    # Output, class prediction
-    out = tf.matmul(dense2, _weights['out']) + _biases['out']
-    return out
-
-
-image_files = tf.train.match_filenames_once("./*JPG")
-image_queue = tf.train.string_input_producer(image_files, num_epochs=None, shuffle=True, seed=None, capacity=32, shared_name=None, name=None)
-
-f = open("28_paths.txt")
-file_lines = f.readlines()
-file_queue = tf.train.string_input_producer(file_lines) 
-images, labels = read_my_file_format(file_queue.dequeue())
-
-# tf Graph input
-x = tf.placeholder(tf.float32, [None, n_input])
-y = tf.placeholder(tf.float32, [None, n_classes])
-#After creating placeholders for the data, the graph is built from the mnist.py file according to a 3-stage pattern: inference(), loss(), and training().
-
-# Store layers weight & bias
-weights = {
-    'wc1': tf.Variable(tf.random_normal([3, 3, 1, 64])),
-    'wc2': tf.Variable(tf.random_normal([3, 3, 64, 128])),
-    'wd1': tf.Variable(tf.random_normal([4*4*256, 1024])),
-    'wd2': tf.Variable(tf.random_normal([1024, 1024])),
-    'out': tf.Variable(tf.random_normal([1024, 8]))
-}
-
-biases = {
-    'bc1': tf.Variable(tf.random_normal([64])),
-    'bc2': tf.Variable(tf.random_normal([128])),
-    'bd1': tf.Variable(tf.random_normal([1024])),
-    'bd2': tf.Variable(tf.random_normal([1024])),
-    'out': tf.Variable(tf.random_normal([n_classes]))
-}
+# Set model weights
+W = tf.Variable(tf.zeros([784, 10]))
+b = tf.Variable(tf.zeros([10]))
 
 # Construct model
-pred = alex_net(x, weights, biases, keep_prob)
+activation = tf.nn.softmax(tf.matmul(x, W) + b) # Softmax
 
-# Define loss and optimizer
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+# Minimize error using cross entropy
+cost = tf.reduce_mean(-tf.reduce_sum(y*tf.log(activation),
+reduction_indices=1)) # Cross entropy
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost) #
 
-# Evaluate model
-correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
-# Initializing the variables
-init = tf.initialize_all_variables()
-
-# Launch the graph
 with tf.Session() as sess:
-    sess.run(init)
-    step = 1
-    # Keep training until reach max iterations
-    while step * batch_size < training_iters:
-        batch_xs, batch_ys = tf.train.batch(image_queue, batch_size)
-        # Fit training using batch data
-        sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys, keep_prob: dropout})
-        if step % display_step == 0:
-            # Calculate batch accuracy
-            acc = sess.run(accuracy, feed_dict={x: batch_xs, y: batch_ys, keep_prob: 1.})
-            # Calculate batch loss
-            loss = sess.run(cost, feed_dict={x: batch_xs, y: batch_ys, keep_prob: 1.})
-            print("Iter " + str(step*batch_size) + ", Minibatch Loss= " + "{:.6f}".format(loss) + ", Training Accuracy= " + "{:.5f}".format(acc))
-        step += 1
-    print ("Optimization Finished!")
+  tf.initialize_all_variables().run()
+  # start populating filename queue
+  coord = tf.train.Coordinator()
+  threads = tf.train.start_queue_runners(coord=coord)
+  try:
+    while not coord.should_stop():
+        # Training cycle
+        for epoch in range(training_epochs):
+            avg_cost = 0.
+            # Loop over all batches
+            num_batches = int(file_length / batch_size)
+            for i in range(num_batches):
+                example_batch, label_batch = sess.run([examples, labels])
+                # Fit training using batch data
+                print(example_batch)
+                sess.run(optimizer, feed_dict={x: example_batch, y: label_batch})
+                # Compute average loss
+                avg_cost += sess.run(cost, feed_dict={x: example_batch, y:
+batch_ys})/num_batches
+                # Display logs per epoch step
+                if epoch % display_step == 0:
+                    print ("Epoch:",'%04d' % (epoch+1),"cost=","{:.9f}".format(avg_cost))
+  except tf.errors.OutOfRangeError:
+      print('Done training, epoch reached')
+  finally:
+    coord.request_stop()
+
+  coord.join(threads) 
